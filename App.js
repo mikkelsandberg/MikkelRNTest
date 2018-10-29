@@ -2,32 +2,27 @@ import React, { Component } from 'react';
 import {
   StyleSheet,
   Text,
-  View
+  View,
+  Picker
 } from 'react-native';
+import DeviceInfoCategories from './DeviceInfoCategories';
 import DeviceInfo from 'react-native-device-info';
 import Orientation from 'react-native-orientation-locker';
+
 
 export default class App extends Component {
   constructor() {
     super();
 
     this.state = {
-      deviceInfoInput: 'isTablet',
+      deviceInfoInput: DeviceInfoCategories[0],
       deviceInfoOutput: '',
-      deviceOrientation: Orientation.getInitialOrientation()
+      deviceOrientation: Orientation.getInitialOrientation(),
     }
   }
 
   componentDidMount() {
-    const { deviceInfoInput } = this.state;
-
-    if (DeviceInfo[deviceInfoInput]() instanceof Promise) {
-      this.asyncGetInfo();
-    } else {
-      this.setState({
-        deviceInfoOutput: DeviceInfo[deviceInfoInput]()
-      });
-    }
+    this._getDeviceInfo();
 
     Orientation.addOrientationListener(this._onOrientationDidChange);
   }
@@ -35,8 +30,20 @@ export default class App extends Component {
   componentWillUnmount() {
     Orientation.removeOrientationListener(this._onOrientationDidChange);
   }
+
+  _getDeviceInfo = () => {
+    const { deviceInfoInput } = this.state;
+
+    if (DeviceInfo[deviceInfoInput]() instanceof Promise) {
+      this._asyncGetInfo();
+    } else {
+      this.setState({
+        deviceInfoOutput: DeviceInfo[deviceInfoInput]()
+      });
+    }
+  };
   
-  async asyncGetInfo() {
+  _asyncGetInfo = async() => {
     try {
       const { deviceInfoInput } = this.state;
       const data = await DeviceInfo[deviceInfoInput]();
@@ -54,14 +61,33 @@ export default class App extends Component {
     });
   };
 
+  _onDeviceInfoInputChange = itemValue => {
+    this.setState({
+      deviceInfoInput: itemValue
+    }, () => {
+      this._getDeviceInfo();
+    });
+  }
+
   render() {
     return (
       <View
         onLayout={this.onLayout}
         style={styles.container}>
-        <Text style={styles.welcome}>Welcome to React Native!</Text>
-        <Text style={styles.instructions}>{`${this.state.deviceInfoInput} => ${this.state.deviceInfoOutput}`}</Text>
-        <Text style={styles.instructions}>{`orientation => ${this.state.deviceOrientation}`}</Text>
+        <Picker
+          style={{width: 200, height: 50}}
+          selectedValue={this.state.deviceInfoInput}
+          onValueChange={itemValue => this._onDeviceInfoInputChange(itemValue)}
+          mode="dropdown"
+        >
+          {
+            DeviceInfoCategories.map((item, id=0) => {
+              return <Picker.Item key={id++} label={item} value={item} />
+            })
+          }
+        </Picker>
+        <Text style={styles.text}>{`${this.state.deviceInfoInput} => ${this.state.deviceInfoOutput}`}</Text>
+        <Text style={styles.text}>{`orientation => ${this.state.deviceOrientation}`}</Text>
       </View>
     );
   }
@@ -74,13 +100,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#F5FCFF',
   },
-  welcome: {
-    fontSize: 20,
-    textAlign: 'center',
-    margin: 10,
-  },
-  instructions: {
-    fontSize: 20,
+  text: {
+    fontSize: 30,
     textAlign: 'center',
     color: '#333333',
     marginBottom: 5,
