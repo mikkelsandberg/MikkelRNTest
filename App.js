@@ -5,6 +5,7 @@ import {
   View
 } from 'react-native';
 import DeviceInfo from 'react-native-device-info';
+import Orientation from 'react-native-orientation-locker';
 
 export default class App extends Component {
   constructor() {
@@ -13,6 +14,7 @@ export default class App extends Component {
     this.state = {
       deviceInfoInput: 'isTablet',
       deviceInfoOutput: '',
+      deviceOrientation: Orientation.getInitialOrientation()
     }
   }
 
@@ -22,10 +24,16 @@ export default class App extends Component {
     if (DeviceInfo[deviceInfoInput]() instanceof Promise) {
       this.asyncGetInfo();
     } else {
-      return this.setState({
+      this.setState({
         deviceInfoOutput: DeviceInfo[deviceInfoInput]()
       });
     }
+
+    Orientation.addOrientationListener(this._onOrientationDidChange);
+  }
+
+  componentWillUnmount() {
+    Orientation.removeOrientationListener(this._onOrientationDidChange);
   }
   
   async asyncGetInfo() {
@@ -40,6 +48,12 @@ export default class App extends Component {
     }
   }
 
+  _onOrientationDidChange = orientation => {
+    this.setState({
+      deviceOrientation: orientation
+    });
+  };
+
   render() {
     return (
       <View
@@ -47,6 +61,7 @@ export default class App extends Component {
         style={styles.container}>
         <Text style={styles.welcome}>Welcome to React Native!</Text>
         <Text style={styles.instructions}>{`${this.state.deviceInfoInput} => ${this.state.deviceInfoOutput}`}</Text>
+        <Text style={styles.instructions}>{`orientation => ${this.state.deviceOrientation}`}</Text>
       </View>
     );
   }
