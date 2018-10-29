@@ -1,33 +1,52 @@
 import React, {Component} from 'react';
-import {StyleSheet, Text, View} from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  View
+} from 'react-native';
 import DeviceInfo from 'react-native-device-info';
 
 export default class App extends Component {
+  constructor() {
+    super();
+
+    this.state = {
+      deviceInfoInput: 'isTablet',
+      deviceInfoOutput: '',
+    }
+  }
+
+  componentDidMount() {
+    const { deviceInfoInput } = this.state;
+
+    if (DeviceInfo[deviceInfoInput]() instanceof Promise) {
+      this.asyncGetInfo();
+    } else {
+      return this.setState({
+        deviceInfoOutput: DeviceInfo[deviceInfoInput]()
+      });
+    }
+  }
+  
+  async asyncGetInfo() {
+    try {
+      const { deviceInfoInput } = this.state;
+      const data = await DeviceInfo[deviceInfoInput]();
+      return this.setState({
+        deviceInfoOutput: data
+      });
+    } catch(err) {
+      console.log(err);
+    }
+  }
+
   render() {
-    const DevInfo = target => {
-      if (DeviceInfo[target]() instanceof Promise) {
-        asyncGetInfo();
-      } else {
-        return DeviceInfo[target]();
-      }
-    }
-
-    async function asyncGetInfo() {
-      try {
-        const data = await DeviceInfo[methodToUse]();
-        console.log(data);
-        return data;
-      } catch(err) {
-        console.log(err);
-      }
-    }
-
-    const methodToUse = 'getBatteryLevel';
-
     return (
-      <View style={styles.container}>
+      <View
+        onLayout={this.onLayout}
+        style={styles.container}>
         <Text style={styles.welcome}>Welcome to React Native!</Text>
-        <Text style={styles.instructions}>{`${methodToUse} => ${DevInfo(methodToUse)}`}</Text>
+        <Text style={styles.instructions}>{`${this.state.deviceInfoInput} => ${this.state.deviceInfoOutput}`}</Text>
       </View>
     );
   }
@@ -46,6 +65,7 @@ const styles = StyleSheet.create({
     margin: 10,
   },
   instructions: {
+    fontSize: 20,
     textAlign: 'center',
     color: '#333333',
     marginBottom: 5,
