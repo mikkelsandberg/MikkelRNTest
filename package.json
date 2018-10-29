@@ -9,7 +9,8 @@
   "dependencies": {
     "react": "16.6.0-alpha.8af6728",
     "react-native": "0.57.4",
-    "react-native-device-info": "^0.24.3"
+    "react-native-device-info": "^0.24.3",
+    "react-native-orientation-locker": "^1.0.19"
   },
   "devDependencies": {
     "babel-jest": "23.6.0",
