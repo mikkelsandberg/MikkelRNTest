@@ -19,7 +19,7 @@
     "metro-react-native-babel-preset": "0.48.1",
     "react-devtools": "^3.4.2",
     "react-test-renderer": "16.6.0-alpha.8af6728",
-    "merge": "^1.2.1"
+    "merge": ">=1.2.1"
   },
   "jest": {
     "preset": "react-native"
