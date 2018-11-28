@@ -86,7 +86,7 @@ export default class App extends Component {
             })
           }
         </Picker>
-        <Text>Hello!</Text>
+        <Text>Hello world!</Text>
         <Text style={styles.text}>{`${this.state.deviceInfoInput} => ${this.state.deviceInfoOutput}`}</Text>
         <Text style={styles.text}>{`orientation => ${this.state.deviceOrientation}`}</Text>
       </View>
